@@ -111,13 +111,13 @@ function UploadPanel() {
       <button
         disabled={!file}
         onClick={() => {
-          // Demo: extract -> seed manual with NS defaults
+          // Demo: extract -> seed with SNCB defaults
           const claim = addClaim({
-            company: "NS",
-            route: "Amsterdam Centraal → Utrecht Centraal",
+            company: "SNCB",
+            route: "Brussels Midi → Antwerpen Centraal",
             date: new Date().toISOString().slice(0, 10),
             delayMinutes: 65,
-            estimatedRefund: estimateRefund("NS", 65),
+            estimatedRefund: estimateRefund("SNCB", 65),
           });
           navigate({ to: "/claims/$id", params: { id: claim.id } });
         }}
@@ -144,7 +144,7 @@ function EmailPanel() {
 
 function ManualForm() {
   const navigate = useNavigate();
-  const [company, setCompany] = useState<"NS" | "KLM" | "Other">("NS");
+  const [company, setCompany] = useState<"SNCB" | "Brussels Airlines" | "Other">("SNCB");
   const [route, setRoute] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [delay, setDelay] = useState(60);
@@ -167,7 +167,7 @@ function ManualForm() {
     <form onSubmit={submit} className="rounded-2xl bg-card border border-border p-6 grid gap-4">
       <Field label="Carrier">
         <div className="flex gap-2">
-          {(["NS", "KLM", "Other"] as const).map((c) => (
+          {(["SNCB", "Brussels Airlines", "Other"] as const).map((c) => (
             <button
               type="button"
               key={c}

@@ -2,7 +2,7 @@ export type ClaimStatus = "pending" | "submitted" | "approved" | "rejected" | "p
 
 export type Claim = {
   id: string;
-  company: "NS" | "KLM" | "Other";
+  company: "SNCB" | "Brussels Airlines" | "Other";
   route: string;
   date: string;
   delayMinutes: number;
@@ -45,18 +45,18 @@ export function addClaim(c: Omit<Claim, "id" | "createdAt" | "status" | "timelin
   return claim;
 }
 
-export function estimateRefund(company: Claim["company"], delayMinutes: number, ticketType?: string): number {
-  // Simple rule-based engine
-  if (company === "NS") {
-    if (delayMinutes >= 120) return 10;
-    if (delayMinutes >= 60) return 5;
-    if (delayMinutes >= 30) return 2.5;
+export function estimateRefund(company: Claim["company"], delayMinutes: number, ticketPrice?: number): number {
+  // Belgian rules (simplified)
+  if (company === "SNCB") {
+    // NMBS/SNCB: 60+ min = 25% of ticket (min €4.20), 120+ min = 50%
+    const price = ticketPrice ?? 12;
+    if (delayMinutes >= 120) return Math.max(price * 0.5, 4.2);
+    if (delayMinutes >= 60) return Math.max(price * 0.25, 4.2);
     return 0;
   }
-  if (company === "KLM") {
-    // EU261 simplified (short-haul)
+  if (company === "Brussels Airlines") {
+    // EU261 simplified (short-haul ≤1500km)
     if (delayMinutes >= 180) return 250;
-    if (delayMinutes >= 120) return 0;
     return 0;
   }
   if (delayMinutes >= 60) return 15;

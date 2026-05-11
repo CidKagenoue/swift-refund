@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Forward an email or snap a ticket. RefundFlow handles NS and KLM compensation claims for you. No win, no fee.",
+          "Forward an email or snap a ticket. RefundFlow handles SNCB and Brussels Airlines compensation claims for you. No win, no fee.",
       },
     ],
   }),
@@ -26,7 +26,7 @@ function Home() {
       <section className="mx-auto max-w-3xl pt-8 sm:pt-16 text-center">
         <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
           <span className="h-1.5 w-1.5 rounded-full bg-foreground" />
-          Live in the Netherlands · NS & KLM
+          Live in Belgium · SNCB & Brussels Airlines
         </span>
 
         <h1 className="mt-6 text-4xl sm:text-6xl font-semibold tracking-tight leading-[1.05]">
