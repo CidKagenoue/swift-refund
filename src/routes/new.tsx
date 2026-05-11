@@ -167,7 +167,7 @@ function ManualForm() {
     <form onSubmit={submit} className="rounded-2xl bg-card border border-border p-6 grid gap-4">
       <Field label="Carrier">
         <div className="flex gap-2">
-          {(["NS", "KLM", "Other"] as const).map((c) => (
+          {(["SNCB", "Brussels Airlines", "Other"] as const).map((c) => (
             <button
               type="button"
               key={c}
