@@ -186,7 +186,7 @@ function ManualForm() {
         <input
           value={route}
           onChange={(e) => setRoute(e.target.value)}
-          placeholder="e.g. Amsterdam → Paris"
+          placeholder="e.g. Brussels Midi → Paris Nord"
           className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
         />
       </Field>
@@ -209,6 +209,18 @@ function ManualForm() {
           className="w-full accent-[color:var(--primary)]"
         />
       </Field>
+      {isRail && (
+        <Field label="Ticket price (€)">
+          <input
+            type="number"
+            min={0}
+            step={0.5}
+            value={price}
+            onChange={(e) => setPrice(Number(e.target.value))}
+            className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
+          />
+        </Field>
+      )}
 
       <div className="rounded-xl bg-accent/40 px-4 py-3 flex items-center justify-between">
         <span className="text-sm">Estimated refund</span>
