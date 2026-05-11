@@ -1,19 +1,41 @@
 export type ClaimStatus = "pending" | "submitted" | "approved" | "rejected" | "paid";
 
+export const CARRIERS = [
+  // Belgian rail
+  "SNCB / NMBS",
+  // International rail accessible from Belgium
+  "Eurostar",
+  "TGV INOUI",
+  "ICE (Deutsche Bahn)",
+  "Nightjet (ÖBB)",
+  // Airlines flying from Brussels / Charleroi
+  "Brussels Airlines",
+  "Ryanair",
+  "TUI fly",
+  "Lufthansa",
+  "Air France",
+  "KLM",
+  "easyJet",
+  "Vueling",
+  "Other",
+] as const;
+
+export type Carrier = (typeof CARRIERS)[number];
+
 export type Claim = {
   id: string;
-  company: "SNCB" | "Brussels Airlines" | "Other";
+  company: Carrier;
   route: string;
   date: string;
   delayMinutes: number;
-  ticketType?: string;
+  ticketPrice?: number;
   estimatedRefund: number;
   status: ClaimStatus;
   createdAt: string;
   timeline: { at: string; label: string }[];
 };
 
-const KEY = "refundflow.claims.v1";
+const KEY = "refundhunters.claims.v1";
 
 export function loadClaims(): Claim[] {
   if (typeof window === "undefined") return [];
@@ -45,20 +67,50 @@ export function addClaim(c: Omit<Claim, "id" | "createdAt" | "status" | "timelin
   return claim;
 }
 
-export function estimateRefund(company: Claim["company"], delayMinutes: number, ticketPrice?: number): number {
-  // Belgian rules (simplified)
-  if (company === "SNCB") {
-    // NMBS/SNCB: 60+ min = 25% of ticket (min €4.20), 120+ min = 50%
+const RAIL: Carrier[] = ["SNCB / NMBS", "Eurostar", "TGV INOUI", "ICE (Deutsche Bahn)", "Nightjet (ÖBB)"];
+const AIRLINES: Carrier[] = [
+  "Brussels Airlines",
+  "Ryanair",
+  "TUI fly",
+  "Lufthansa",
+  "Air France",
+  "KLM",
+  "easyJet",
+  "Vueling",
+];
+
+export function carrierType(c: Carrier): "rail" | "air" | "other" {
+  if (RAIL.includes(c)) return "rail";
+  if (AIRLINES.includes(c)) return "air";
+  return "other";
+}
+
+export function estimateRefund(company: Carrier, delayMinutes: number, ticketPrice?: number): number {
+  const type = carrierType(company);
+
+  if (company === "SNCB / NMBS") {
+    // NMBS/SNCB: 60+ min = 25% (min €4.20), 120+ min = 50%
     const price = ticketPrice ?? 12;
     if (delayMinutes >= 120) return Math.max(price * 0.5, 4.2);
     if (delayMinutes >= 60) return Math.max(price * 0.25, 4.2);
     return 0;
   }
-  if (company === "Brussels Airlines") {
-    // EU261 simplified (short-haul ≤1500km)
+
+  if (type === "rail") {
+    // EU rail passenger rights (CIV): 60+ min = 25%, 120+ min = 50% of ticket
+    const price = ticketPrice ?? 40;
+    if (delayMinutes >= 120) return price * 0.5;
+    if (delayMinutes >= 60) return price * 0.25;
+    return 0;
+  }
+
+  if (type === "air") {
+    // EU261 simplified — assume short/medium haul from Belgium
+    // <1500km → €250, 1500-3500km → €400, >3500km → €600
     if (delayMinutes >= 180) return 250;
     return 0;
   }
+
   if (delayMinutes >= 60) return 15;
   return 0;
 }
