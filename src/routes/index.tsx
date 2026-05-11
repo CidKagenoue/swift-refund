@@ -7,11 +7,11 @@ export const Route = createFileRoute("/")({
   component: Home,
   head: () => ({
     meta: [
-      { title: "RefundFlow — Get your train & flight refund in 2 minutes" },
+      { title: "RefundHunters — Get your train & flight refund in 2 minutes" },
       {
         name: "description",
         content:
-          "Forward an email or snap a ticket. RefundFlow handles SNCB and Brussels Airlines compensation claims for you. No win, no fee.",
+          "Forward an email or snap a ticket. RefundHunters handles SNCB, Brussels Airlines and other Belgian carrier compensation claims for you. No win, no fee.",
       },
     ],
   }),
