@@ -5,7 +5,7 @@ import { loadClaims, type Claim } from "@/lib/claims";
 
 export const Route = createFileRoute("/claims")({
   component: Claims,
-  head: () => ({ meta: [{ title: "My claims · RefundFlow" }] }),
+  head: () => ({ meta: [{ title: "My claims · RefundHunters" }] }),
 });
 
 function Claims() {

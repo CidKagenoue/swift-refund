@@ -7,11 +7,11 @@ export const Route = createFileRoute("/")({
   component: Home,
   head: () => ({
     meta: [
-      { title: "RefundFlow — Get your train & flight refund in 2 minutes" },
+      { title: "RefundHunters — Get your train & flight refund in 2 minutes" },
       {
         name: "description",
         content:
-          "Forward an email or snap a ticket. RefundFlow handles SNCB and Brussels Airlines compensation claims for you. No win, no fee.",
+          "Forward an email or snap a ticket. RefundHunters handles SNCB, Brussels Airlines and other Belgian carrier compensation claims for you. No win, no fee.",
       },
     ],
   }),
@@ -26,7 +26,7 @@ function Home() {
       <section className="mx-auto max-w-3xl pt-8 sm:pt-16 text-center">
         <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
           <span className="h-1.5 w-1.5 rounded-full bg-foreground" />
-          Live in Belgium · SNCB & Brussels Airlines
+          Live in Belgium · SNCB · Brussels Airlines · Ryanair · Eurostar +more
         </span>
 
         <h1 className="mt-6 text-4xl sm:text-6xl font-semibold tracking-tight leading-[1.05]">

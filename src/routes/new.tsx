@@ -1,13 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Shell } from "@/components/Layout";
-import { addClaim, estimateRefund } from "@/lib/claims";
+import { addClaim, CARRIERS, type Carrier, carrierType, estimateRefund } from "@/lib/claims";
 
 export const Route = createFileRoute("/new")({
   component: NewClaim,
   head: () => ({
     meta: [
-      { title: "Start a refund · RefundFlow" },
+      { title: "Start a refund · RefundHunters" },
       { name: "description", content: "Upload a ticket, forward an email, or enter details manually." },
     ],
   }),
@@ -113,11 +113,12 @@ function UploadPanel() {
         onClick={() => {
           // Demo: extract -> seed with SNCB defaults
           const claim = addClaim({
-            company: "SNCB",
+            company: "SNCB / NMBS",
             route: "Brussels Midi → Antwerpen Centraal",
             date: new Date().toISOString().slice(0, 10),
             delayMinutes: 65,
-            estimatedRefund: estimateRefund("SNCB", 65),
+            ticketPrice: 12,
+            estimatedRefund: estimateRefund("SNCB / NMBS", 65, 12),
           });
           navigate({ to: "/claims/$id", params: { id: claim.id } });
         }}
@@ -134,7 +135,7 @@ function EmailPanel() {
   return (
     <div className="rounded-2xl bg-card border border-border p-6">
       <p className="text-sm text-muted-foreground">Forward your booking or delay confirmation to:</p>
-      <div className="mt-3 rounded-xl bg-secondary px-4 py-3 font-mono text-sm">claims@refundflow.app</div>
+      <div className="mt-3 rounded-xl bg-secondary px-4 py-3 font-mono text-sm">claims@refundhunters.app</div>
       <p className="mt-3 text-xs text-muted-foreground">
         Or connect your inbox to detect delays automatically — coming soon.
       </p>
@@ -144,12 +145,14 @@ function EmailPanel() {
 
 function ManualForm() {
   const navigate = useNavigate();
-  const [company, setCompany] = useState<"SNCB" | "Brussels Airlines" | "Other">("SNCB");
+  const [company, setCompany] = useState<Carrier>("SNCB / NMBS");
   const [route, setRoute] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [delay, setDelay] = useState(60);
+  const [price, setPrice] = useState(12);
 
-  const refund = estimateRefund(company, delay);
+  const isRail = carrierType(company) === "rail";
+  const refund = estimateRefund(company, delay, price);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,6 +161,7 @@ function ManualForm() {
       route: route || "—",
       date,
       delayMinutes: delay,
+      ticketPrice: isRail ? price : undefined,
       estimatedRefund: refund,
     });
     navigate({ to: "/claims/$id", params: { id: claim.id } });
@@ -166,26 +170,23 @@ function ManualForm() {
   return (
     <form onSubmit={submit} className="rounded-2xl bg-card border border-border p-6 grid gap-4">
       <Field label="Carrier">
-        <div className="flex gap-2">
-          {(["SNCB", "Brussels Airlines", "Other"] as const).map((c) => (
-            <button
-              type="button"
-              key={c}
-              onClick={() => setCompany(c)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium border transition ${
-                company === c ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border"
-              }`}
-            >
+        <select
+          value={company}
+          onChange={(e) => setCompany(e.target.value as Carrier)}
+          className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
+        >
+          {CARRIERS.map((c) => (
+            <option key={c} value={c}>
               {c}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
       </Field>
       <Field label="Route">
         <input
           value={route}
           onChange={(e) => setRoute(e.target.value)}
-          placeholder="e.g. Amsterdam → Paris"
+          placeholder="e.g. Brussels Midi → Paris Nord"
           className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
         />
       </Field>
@@ -208,6 +209,18 @@ function ManualForm() {
           className="w-full accent-[color:var(--primary)]"
         />
       </Field>
+      {isRail && (
+        <Field label="Ticket price (€)">
+          <input
+            type="number"
+            min={0}
+            step={0.5}
+            value={price}
+            onChange={(e) => setPrice(Number(e.target.value))}
+            className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
+          />
+        </Field>
+      )}
 
       <div className="rounded-xl bg-accent/40 px-4 py-3 flex items-center justify-between">
         <span className="text-sm">Estimated refund</span>
