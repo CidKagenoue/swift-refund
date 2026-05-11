@@ -146,22 +146,33 @@ function EmailPanel() {
 function ManualForm() {
   const navigate = useNavigate();
   const [company, setCompany] = useState<Carrier>("SNCB / NMBS");
-  const [route, setRoute] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [delay, setDelay] = useState(60);
-  const [price, setPrice] = useState(12);
+  const [delay, setDelay] = useState("60");
+  const [price, setPrice] = useState("12");
 
   const isRail = carrierType(company) === "rail";
-  const refund = estimateRefund(company, delay, price);
+  const isAir = carrierType(company) === "air";
+  const delayMinutes = Number(delay) || 0;
+  const ticketPrice = Number(price) || 0;
+  const refund = estimateRefund(company, delayMinutes, ticketPrice);
+  const presetDelays = [30, 60, 90, 120, 180];
+  const routeFromOptions = isRail
+    ? ["Brussels Midi", "Antwerpen Centraal", "Gent-Sint-Pieters", "Liège-Guillemins", "Paris Nord"]
+    : ["Brussels Airport", "Brussels South Charleroi", "London Heathrow", "Paris Charles de Gaulle", "Barcelona El Prat"];
+  const routeToOptions = isRail
+    ? ["Antwerpen Centraal", "Gent-Sint-Pieters", "Liège-Guillemins", "Paris Nord", "Amsterdam Centraal"]
+    : ["London Heathrow", "Paris Charles de Gaulle", "Barcelona El Prat", "Rome Fiumicino", "Amsterdam Schiphol"];
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const claim = addClaim({
       company,
-      route: route || "—",
+      route: `${from || "—"} → ${to || "—"}`,
       date,
-      delayMinutes: delay,
-      ticketPrice: isRail ? price : undefined,
+      delayMinutes,
+      ticketPrice: isRail ? ticketPrice : undefined,
       estimatedRefund: refund,
     });
     navigate({ to: "/claims/$id", params: { id: claim.id } });
@@ -183,12 +194,38 @@ function ManualForm() {
         </select>
       </Field>
       <Field label="Route">
-        <input
-          value={route}
-          onChange={(e) => setRoute(e.target.value)}
-          placeholder="e.g. Brussels Midi → Paris Nord"
-          className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
-        />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <span className="mb-2 block text-[11px] font-medium uppercase tracking-wide text-muted-foreground">From</span>
+            <input
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              placeholder={isRail ? "Brussels Midi" : "Brussels Airport"}
+              list="route-from-options"
+              className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
+            />
+          </div>
+          <div>
+            <span className="mb-2 block text-[11px] font-medium uppercase tracking-wide text-muted-foreground">To</span>
+            <input
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              placeholder={isRail ? "Paris Nord" : "London Heathrow"}
+              list="route-to-options"
+              className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
+            />
+          </div>
+        </div>
+        <datalist id="route-from-options">
+          {routeFromOptions.map((option) => (
+            <option key={option} value={option} />
+          ))}
+        </datalist>
+        <datalist id="route-to-options">
+          {routeToOptions.map((option) => (
+            <option key={option} value={option} />
+          ))}
+        </datalist>
       </Field>
       <Field label="Date">
         <input
@@ -198,16 +235,36 @@ function ManualForm() {
           className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
         />
       </Field>
-      <Field label={`Delay: ${delay} min`}>
+      <Field label="Delay (minutes)">
+        <div className="flex gap-2 mb-2">
+          {presetDelays.map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => setDelay(String(d))}
+              aria-pressed={delayMinutes === d}
+              className={`rounded-full px-3 py-1 text-sm transition border ${
+                delayMinutes === d ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border"
+              }`}
+            >
+              {d} min
+            </button>
+          ))}
+        </div>
         <input
-          type="range"
+          type="number"
           min={0}
           max={300}
-          step={5}
+          step={1}
           value={delay}
-          onChange={(e) => setDelay(Number(e.target.value))}
-          className="w-full accent-[color:var(--primary)]"
+          onChange={(e) => setDelay(e.target.value)}
+          className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
         />
+        {isAir && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Flight claims usually start at 3 hours+ delay. Longer delays matter more for compensation, especially on longer routes.
+          </p>
+        )}
       </Field>
       {isRail && (
         <Field label="Ticket price (€)">
@@ -216,7 +273,7 @@ function ManualForm() {
             min={0}
             step={0.5}
             value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
+            onChange={(e) => setPrice(e.target.value)}
             className="w-full rounded-xl border border-border bg-background px-4 py-3 outline-none focus:border-primary"
           />
         </Field>

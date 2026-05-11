@@ -8,12 +8,14 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import logo from "@/assets/logo.png";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
+        <img src={logo} alt="RefundHunters logo" className="mx-auto mb-5 h-14 w-14" />
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -39,6 +41,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
+        <img src={logo} alt="RefundHunters logo" className="mx-auto mb-5 h-14 w-14" />
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           This page didn't load
         </h1>
@@ -75,13 +78,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "RefundHunters — Get your refund in 2 minutes" },
       { name: "description", content: "Refund assistant for delayed trains and flights from Belgium. No win, no fee." },
       { name: "author", content: "RefundHunters" },
+      { property: "og:image", content: logo },
       { property: "og:title", content: "RefundHunters — Get your refund in 2 minutes" },
       { property: "og:description", content: "Refund assistant for delayed trains and flights from Belgium." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:image", content: logo },
     ],
     links: [
+      { rel: "icon", href: logo, type: "image/png" },
+      { rel: "apple-touch-icon", href: logo },
       {
         rel: "stylesheet",
         href: appCss,

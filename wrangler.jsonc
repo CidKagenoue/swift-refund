@@ -4,4 +4,12 @@
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
+  "alias": {
+    "#tanstack-router-entry": "./src/router.tsx",
+    "#tanstack-start-entry": "./src/start.ts",
+    "#tanstack-start-plugin-adapters": "./src/start.ts",
+    "tanstack-start-manifest:v": "./src/routeTree.gen.ts",
+    "tanstack-start-injected-head-scripts:v": "./src/start.ts",
+    "tailwindcss": "./node_modules/tailwindcss/index.css"
+  }
 }

@@ -105,8 +105,10 @@ export function estimateRefund(company: Carrier, delayMinutes: number, ticketPri
   }
 
   if (type === "air") {
-    // EU261 simplified — assume short/medium haul from Belgium
-    // <1500km → €250, 1500-3500km → €400, >3500km → €600
+    // EU261 simplified — flight compensation starts at 3h+
+    // We keep the UI simple: delay thresholds are 3h, 4h, and 5h+.
+    if (delayMinutes >= 300) return 600;
+    if (delayMinutes >= 240) return 400;
     if (delayMinutes >= 180) return 250;
     return 0;
   }

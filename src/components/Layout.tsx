@@ -27,7 +27,10 @@ export function Shell({ children }: { children: ReactNode }) {
       </header>
       <main className="flex-1 px-5 sm:px-8 pb-16">{children}</main>
       <footer className="px-5 sm:px-8 py-8 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
-        <span>© {new Date().getFullYear()} RefundHunters — only pay if you get refunded.</span>
+        <span className="inline-flex items-center gap-2">
+          <Brand className="text-foreground" />
+          <span>© {new Date().getFullYear()} RefundHunters — only pay if you get refunded.</span>
+        </span>
         <span>18% success fee · No win, no fee</span>
       </footer>
     </div>
