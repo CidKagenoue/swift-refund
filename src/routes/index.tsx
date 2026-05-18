@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { Shell } from "@/components/Layout";
-import { loadClaims, type Claim } from "@/lib/claims";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -11,15 +10,14 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Forward an email or snap a ticket. RefundHunters handles SNCB, Brussels Airlines and other Belgian carrier compensation claims for you. No win, no fee.",
+          "Claim compensation for delayed or cancelled flights and trains. EU261 for flights, Delay Repay for trains. No win, no fee.",
       },
     ],
   }),
 });
 
 function Home() {
-  const [claims, setClaims] = useState<Claim[]>([]);
-  useEffect(() => setClaims(loadClaims()), []);
+  const { user } = useAuth();
 
   return (
     <Shell>
@@ -35,33 +33,29 @@ function Home() {
         </h1>
 
         <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto">
-          Forward your ticket. We do the paperwork, write the email, and chase the refund.
+          We handle EU261 flight compensation (€250–€600) and train delay repay claims for you.
           You only pay if it works.
         </p>
 
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
-            to="/new"
-            className="inline-flex items-center justify-center rounded-2xl bg-primary text-primary-foreground px-6 py-4 text-base font-semibold shadow-[var(--shadow-pop)] hover:opacity-95 transition w-full sm:w-auto"
-          >
-            Start a refund →
+          <Link to={user ? "/new" : "/signup"}
+            className="inline-flex items-center justify-center rounded-2xl bg-primary text-primary-foreground px-6 py-4 text-base font-semibold shadow-[var(--shadow-pop)] hover:opacity-95 transition w-full sm:w-auto">
+            {user ? "Start a refund →" : "Get started →"}
           </Link>
-          <Link
-            to="/claims"
-            className="inline-flex items-center justify-center rounded-2xl bg-card px-6 py-4 text-base font-semibold border border-border hover:bg-secondary transition w-full sm:w-auto"
-          >
-            See my claims
+          <Link to={user ? "/claims" : "/login"}
+            className="inline-flex items-center justify-center rounded-2xl bg-card px-6 py-4 text-base font-semibold border border-border hover:bg-secondary transition w-full sm:w-auto">
+            {user ? "See my claims" : "I have an account"}
           </Link>
         </div>
 
-        <p className="mt-4 text-xs text-muted-foreground">2 minutes · No account needed to start</p>
+        <p className="mt-4 text-xs text-muted-foreground">2 minutes · 18% success fee</p>
       </section>
 
       <section className="mx-auto max-w-5xl mt-20 grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { n: "1", t: "Send us your ticket", d: "Upload a PDF, screenshot, or just type the route." },
-          { n: "2", t: "We check the rules", d: "Eligibility, amount, and the right form — instantly." },
-          { n: "3", t: "Refund lands in your account", d: "We follow up until the carrier pays out." },
+          { n: "1", t: "Enter your booking", d: "Carrier, route, date, and what went wrong." },
+          { n: "2", t: "We calculate & file", d: "Compensation is calculated under EU261 / Delay Repay rules." },
+          { n: "3", t: "Refund to your bank", d: "Once approved, add your IBAN and we pay out — flights ~7 days, trains up to 28." },
         ].map((s) => (
           <div key={s.n} className="rounded-2xl bg-card p-6 border border-border shadow-[var(--shadow-soft)]">
             <div className="h-8 w-8 rounded-xl bg-accent text-accent-foreground inline-flex items-center justify-center text-sm font-bold">
@@ -72,51 +66,6 @@ function Home() {
           </div>
         ))}
       </section>
-
-      {claims.length > 0 && (
-        <section className="mx-auto max-w-3xl mt-16">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">Your recent claims</h2>
-            <Link to="/claims" className="text-sm text-primary font-medium">
-              View all
-            </Link>
-          </div>
-          <div className="rounded-2xl bg-card border border-border divide-y divide-border overflow-hidden">
-            {claims.slice(0, 3).map((c) => (
-              <Link
-                key={c.id}
-                to="/claims/$id"
-                params={{ id: c.id }}
-                className="flex items-center justify-between px-5 py-4 hover:bg-secondary transition"
-              >
-                <div>
-                  <p className="font-medium">{c.company} · {c.route}</p>
-                  <p className="text-xs text-muted-foreground">{new Date(c.date).toLocaleDateString()} · {c.delayMinutes} min delay</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">€{c.estimatedRefund.toFixed(2)}</p>
-                  <StatusBadge status={c.status} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
     </Shell>
-  );
-}
-
-function StatusBadge({ status }: { status: Claim["status"] }) {
-  const map: Record<Claim["status"], string> = {
-    pending: "bg-muted text-muted-foreground",
-    submitted: "bg-accent text-accent-foreground",
-    approved: "bg-primary/10 text-primary",
-    rejected: "bg-destructive/10 text-destructive",
-    paid: "bg-success/20 text-success-foreground",
-  };
-  return (
-    <span className={`inline-block mt-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${map[status]}`}>
-      {status}
-    </span>
   );
 }

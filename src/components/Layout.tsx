@@ -1,28 +1,43 @@
 import { Link } from "@tanstack/react-router";
 import { Brand } from "./Brand";
 import type { ReactNode } from "react";
+import { useAuth } from "@/lib/auth";
+import { useNavigate } from "@tanstack/react-router";
 
 export function Shell({ children }: { children: ReactNode }) {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="px-5 sm:px-8 py-5 flex items-center justify-between">
         <Brand />
         <nav className="flex items-center gap-1 text-sm">
-          <Link
-            to="/"
-            className="px-3 py-2 rounded-lg hover:bg-secondary transition"
-            activeProps={{ className: "px-3 py-2 rounded-lg bg-secondary" }}
-            activeOptions={{ exact: true }}
-          >
+          <Link to="/" className="px-3 py-2 rounded-lg hover:bg-secondary transition"
+            activeProps={{ className: "px-3 py-2 rounded-lg bg-secondary" }} activeOptions={{ exact: true }}>
             Home
           </Link>
-          <Link
-            to="/claims"
-            className="px-3 py-2 rounded-lg hover:bg-secondary transition"
-            activeProps={{ className: "px-3 py-2 rounded-lg bg-secondary" }}
-          >
-            Claims
-          </Link>
+          {user ? (
+            <>
+              <Link to="/claims" className="px-3 py-2 rounded-lg hover:bg-secondary transition"
+                activeProps={{ className: "px-3 py-2 rounded-lg bg-secondary" }}>
+                Claims
+              </Link>
+              <button
+                onClick={async () => { await signOut(); navigate({ to: "/" }); }}
+                className="ml-1 px-3 py-2 rounded-lg text-muted-foreground hover:bg-secondary"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="px-3 py-2 rounded-lg hover:bg-secondary transition">Sign in</Link>
+              <Link to="/signup" className="ml-1 px-3 py-2 rounded-lg bg-primary text-primary-foreground font-medium">
+                Sign up
+              </Link>
+            </>
+          )}
         </nav>
       </header>
       <main className="flex-1 px-5 sm:px-8 pb-16">{children}</main>
