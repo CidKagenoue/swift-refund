@@ -14,7 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bank_details: {
+        Row: {
+          account_holder: string
+          bic: string | null
+          claim_id: string
+          created_at: string
+          iban: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          account_holder: string
+          bic?: string | null
+          claim_id: string
+          created_at?: string
+          iban: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          account_holder?: string
+          bic?: string | null
+          claim_id?: string
+          created_at?: string
+          iban?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_details_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: true
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claims: {
+        Row: {
+          attachments: Json
+          booking_reference: string
+          carrier: string
+          created_at: string
+          delay_minutes: number
+          description: string | null
+          destination: string
+          disruption: Database["public"]["Enums"]["disruption_type"]
+          estimated_compensation: number
+          flight_distance_km: number | null
+          id: string
+          origin: string
+          status: Database["public"]["Enums"]["claim_status"]
+          ticket_price: number | null
+          timeline: Json
+          transport_type: Database["public"]["Enums"]["transport_type"]
+          travel_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attachments?: Json
+          booking_reference: string
+          carrier: string
+          created_at?: string
+          delay_minutes?: number
+          description?: string | null
+          destination: string
+          disruption: Database["public"]["Enums"]["disruption_type"]
+          estimated_compensation?: number
+          flight_distance_km?: number | null
+          id?: string
+          origin: string
+          status?: Database["public"]["Enums"]["claim_status"]
+          ticket_price?: number | null
+          timeline?: Json
+          transport_type: Database["public"]["Enums"]["transport_type"]
+          travel_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attachments?: Json
+          booking_reference?: string
+          carrier?: string
+          created_at?: string
+          delay_minutes?: number
+          description?: string | null
+          destination?: string
+          disruption?: Database["public"]["Enums"]["disruption_type"]
+          estimated_compensation?: number
+          flight_distance_km?: number | null
+          id?: string
+          origin?: string
+          status?: Database["public"]["Enums"]["claim_status"]
+          ticket_price?: number | null
+          timeline?: Json
+          transport_type?: Database["public"]["Enums"]["transport_type"]
+          travel_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +126,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      claim_status:
+        | "submitted"
+        | "under_review"
+        | "approved"
+        | "paid"
+        | "rejected"
+      disruption_type: "delay" | "cancellation"
+      transport_type: "flight" | "train"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +260,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      claim_status: [
+        "submitted",
+        "under_review",
+        "approved",
+        "paid",
+        "rejected",
+      ],
+      disruption_type: ["delay", "cancellation"],
+      transport_type: ["flight", "train"],
+    },
   },
 } as const
