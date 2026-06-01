@@ -98,6 +98,22 @@ function ClaimDetail() {
           </p>
         </section>
 
+        {/* Approval celebration + bank prompt */}
+        {claim.status === "approved" && !bank && (
+          <div className="mt-6 rounded-2xl bg-accent text-accent-foreground p-5 border-2 border-accent animate-in fade-in">
+            <p className="text-sm font-bold uppercase tracking-wide">🎉 Your refund was approved!</p>
+            <p className="mt-1 text-sm">
+              Add your bank details below and we'll transfer <strong>€{(amount - amount * COMMISSION_RATE).toFixed(2)}</strong> within {eta} days.
+            </p>
+          </div>
+        )}
+        {claim.status === "paid" && (
+          <div className="mt-6 rounded-2xl bg-primary/10 text-foreground p-5 border border-primary/30">
+            <p className="text-sm font-bold uppercase tracking-wide text-primary">✓ Refund paid</p>
+            <p className="mt-1 text-sm">Sent to the account below. It may take 1–2 business days to appear.</p>
+          </div>
+        )}
+
         {/* Bank details after approval */}
         {(claim.status === "approved" || claim.status === "paid") && (
           <BankSection claimId={claim.id} initial={bank} onSaved={setBank} disabled={claim.status === "paid"} />

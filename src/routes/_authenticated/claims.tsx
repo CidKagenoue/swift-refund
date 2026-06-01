@@ -35,6 +35,15 @@ function ClaimsPage() {
           <Stat label="Received" value={`€${paid.toFixed(2)}`} tone="accent" />
         </div>
 
+        {claims.filter((c) => c.status === "approved").length > 0 && (
+          <div className="mt-4 rounded-2xl bg-accent text-accent-foreground p-4 border-2 border-accent">
+            <p className="text-sm font-bold">💰 Action needed</p>
+            <p className="text-sm mt-1">
+              {claims.filter((c) => c.status === "approved").length} approved claim(s) waiting for your bank details to receive payout.
+            </p>
+          </div>
+        )}
+
         <div className="mt-8">
           {loading ? (
             <p className="text-sm text-muted-foreground text-center py-10">Loading…</p>
