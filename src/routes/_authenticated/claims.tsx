@@ -16,20 +16,24 @@ function ClaimsPage() {
     listClaims().then((c) => { setClaims(c); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
-  // Auto-approve any submitted claims that are >10s old
+  // Auto-approve submitted claims after 10s
   useEffect(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
     claims.forEach((c) => {
       if (c.status !== "submitted") return;
-      const created = new Date(c.created_at).getTime();
-      const elapsed = Date.now() - created;
-      if (elapsed < 10000) {
-        setTimeout(async () => {
-          const updated = await import("@/lib/claims").then((m) => m.advanceStatus(c, "approved", "Carrier approved compensation"));
+      const elapsed = Date.now() - new Date(c.created_at).getTime();
+      const delay = Math.max(0, 10000 - elapsed);
+      const t = setTimeout(async () => {
+        try {
+          const { advanceStatus } = await import("@/lib/claims");
+          const updated = await advanceStatus(c, "approved", "Carrier approved compensation");
           setClaims((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
-        }, 10000 - elapsed);
-      }
+        } catch {}
+      }, delay);
+      timers.push(t);
     });
-  }, [claims.map((c) => c.id).join(",")]);
+    return () => timers.forEach(clearTimeout);
+  }, [claims.map((c) => `${c.id}:${c.status}`).join(",")]);
 
   const pending = claims.filter((c) => c.status !== "paid" && c.status !== "rejected")
     .reduce((s, c) => s + Number(c.estimated_compensation), 0);
