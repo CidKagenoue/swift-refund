@@ -27,6 +27,19 @@ function ClaimDetail() {
     })();
   }, [id]);
 
+  // Auto-approve claim ~10 seconds after creation
+  useEffect(() => {
+    if (!claim || claim.status !== "submitted") return;
+    const created = new Date(claim.created_at).getTime();
+    const elapsed = Date.now() - created;
+    const delay = Math.max(0, 10000 - elapsed);
+    const timer = setTimeout(async () => {
+      const updated = await advanceStatus(claim, "approved", "Carrier approved compensation");
+      setClaim(updated);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [claim?.id, claim?.status, claim?.created_at]);
+
   if (loading) return <Shell><p className="text-center text-muted-foreground pt-10">Loading…</p></Shell>;
 
   if (!claim) {

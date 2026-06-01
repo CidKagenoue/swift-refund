@@ -16,6 +16,21 @@ function ClaimsPage() {
     listClaims().then((c) => { setClaims(c); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
+  // Auto-approve any submitted claims that are >10s old
+  useEffect(() => {
+    claims.forEach((c) => {
+      if (c.status !== "submitted") return;
+      const created = new Date(c.created_at).getTime();
+      const elapsed = Date.now() - created;
+      if (elapsed < 10000) {
+        setTimeout(async () => {
+          const updated = await import("@/lib/claims").then((m) => m.advanceStatus(c, "approved", "Carrier approved compensation"));
+          setClaims((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
+        }, 10000 - elapsed);
+      }
+    });
+  }, [claims.map((c) => c.id).join(",")]);
+
   const pending = claims.filter((c) => c.status !== "paid" && c.status !== "rejected")
     .reduce((s, c) => s + Number(c.estimated_compensation), 0);
   const paid = claims.filter((c) => c.status === "paid").reduce((s, c) => s + Number(c.estimated_compensation), 0);
