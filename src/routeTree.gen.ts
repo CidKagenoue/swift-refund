@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedNewRouteImport } from './routes/_authenticated/new'
 import { Route as AuthenticatedClaimsRouteImport } from './routes/_authenticated/claims'
 import { Route as AuthenticatedClaimsIdRouteImport } from './routes/_authenticated/claims.$id'
+import { Route as AuthenticatedClaimsIdBankRouteImport } from './routes/_authenticated/claims.$id.bank'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -51,6 +52,12 @@ const AuthenticatedClaimsIdRoute = AuthenticatedClaimsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedClaimsRoute,
 } as any)
+const AuthenticatedClaimsIdBankRoute =
+  AuthenticatedClaimsIdBankRouteImport.update({
+    id: '/bank',
+    path: '/bank',
+    getParentRoute: () => AuthenticatedClaimsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -58,7 +65,8 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/claims': typeof AuthenticatedClaimsRouteWithChildren
   '/new': typeof AuthenticatedNewRoute
-  '/claims/$id': typeof AuthenticatedClaimsIdRoute
+  '/claims/$id': typeof AuthenticatedClaimsIdRouteWithChildren
+  '/claims/$id/bank': typeof AuthenticatedClaimsIdBankRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -66,7 +74,8 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/claims': typeof AuthenticatedClaimsRouteWithChildren
   '/new': typeof AuthenticatedNewRoute
-  '/claims/$id': typeof AuthenticatedClaimsIdRoute
+  '/claims/$id': typeof AuthenticatedClaimsIdRouteWithChildren
+  '/claims/$id/bank': typeof AuthenticatedClaimsIdBankRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,13 +85,28 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_authenticated/claims': typeof AuthenticatedClaimsRouteWithChildren
   '/_authenticated/new': typeof AuthenticatedNewRoute
-  '/_authenticated/claims/$id': typeof AuthenticatedClaimsIdRoute
+  '/_authenticated/claims/$id': typeof AuthenticatedClaimsIdRouteWithChildren
+  '/_authenticated/claims/$id/bank': typeof AuthenticatedClaimsIdBankRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup' | '/claims' | '/new' | '/claims/$id'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/claims'
+    | '/new'
+    | '/claims/$id'
+    | '/claims/$id/bank'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/claims' | '/new' | '/claims/$id'
+  to:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/claims'
+    | '/new'
+    | '/claims/$id'
+    | '/claims/$id/bank'
   id:
     | '__root__'
     | '/'
@@ -92,6 +116,7 @@ export interface FileRouteTypes {
     | '/_authenticated/claims'
     | '/_authenticated/new'
     | '/_authenticated/claims/$id'
+    | '/_authenticated/claims/$id/bank'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -152,15 +177,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClaimsIdRouteImport
       parentRoute: typeof AuthenticatedClaimsRoute
     }
+    '/_authenticated/claims/$id/bank': {
+      id: '/_authenticated/claims/$id/bank'
+      path: '/bank'
+      fullPath: '/claims/$id/bank'
+      preLoaderRoute: typeof AuthenticatedClaimsIdBankRouteImport
+      parentRoute: typeof AuthenticatedClaimsIdRoute
+    }
   }
 }
 
+interface AuthenticatedClaimsIdRouteChildren {
+  AuthenticatedClaimsIdBankRoute: typeof AuthenticatedClaimsIdBankRoute
+}
+
+const AuthenticatedClaimsIdRouteChildren: AuthenticatedClaimsIdRouteChildren = {
+  AuthenticatedClaimsIdBankRoute: AuthenticatedClaimsIdBankRoute,
+}
+
+const AuthenticatedClaimsIdRouteWithChildren =
+  AuthenticatedClaimsIdRoute._addFileChildren(
+    AuthenticatedClaimsIdRouteChildren,
+  )
+
 interface AuthenticatedClaimsRouteChildren {
-  AuthenticatedClaimsIdRoute: typeof AuthenticatedClaimsIdRoute
+  AuthenticatedClaimsIdRoute: typeof AuthenticatedClaimsIdRouteWithChildren
 }
 
 const AuthenticatedClaimsRouteChildren: AuthenticatedClaimsRouteChildren = {
-  AuthenticatedClaimsIdRoute: AuthenticatedClaimsIdRoute,
+  AuthenticatedClaimsIdRoute: AuthenticatedClaimsIdRouteWithChildren,
 }
 
 const AuthenticatedClaimsRouteWithChildren =
