@@ -16,7 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedNewRouteImport } from './routes/_authenticated/new'
 import { Route as AuthenticatedClaimsRouteImport } from './routes/_authenticated/claims'
 import { Route as AuthenticatedClaimsIdRouteImport } from './routes/_authenticated/claims.$id'
-import { Route as AuthenticatedClaimsIdBankRouteImport } from './routes/_authenticated/claims.$id.bank'
+import { Route as AuthenticatedBankIdRouteImport } from './routes/_authenticated/bank.$id'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -52,12 +52,11 @@ const AuthenticatedClaimsIdRoute = AuthenticatedClaimsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedClaimsRoute,
 } as any)
-const AuthenticatedClaimsIdBankRoute =
-  AuthenticatedClaimsIdBankRouteImport.update({
-    id: '/bank',
-    path: '/bank',
-    getParentRoute: () => AuthenticatedClaimsIdRoute,
-  } as any)
+const AuthenticatedBankIdRoute = AuthenticatedBankIdRouteImport.update({
+  id: '/bank/$id',
+  path: '/bank/$id',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -65,8 +64,8 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/claims': typeof AuthenticatedClaimsRouteWithChildren
   '/new': typeof AuthenticatedNewRoute
-  '/claims/$id': typeof AuthenticatedClaimsIdRouteWithChildren
-  '/claims/$id/bank': typeof AuthenticatedClaimsIdBankRoute
+  '/bank/$id': typeof AuthenticatedBankIdRoute
+  '/claims/$id': typeof AuthenticatedClaimsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -74,8 +73,8 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/claims': typeof AuthenticatedClaimsRouteWithChildren
   '/new': typeof AuthenticatedNewRoute
-  '/claims/$id': typeof AuthenticatedClaimsIdRouteWithChildren
-  '/claims/$id/bank': typeof AuthenticatedClaimsIdBankRoute
+  '/bank/$id': typeof AuthenticatedBankIdRoute
+  '/claims/$id': typeof AuthenticatedClaimsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -85,8 +84,8 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_authenticated/claims': typeof AuthenticatedClaimsRouteWithChildren
   '/_authenticated/new': typeof AuthenticatedNewRoute
-  '/_authenticated/claims/$id': typeof AuthenticatedClaimsIdRouteWithChildren
-  '/_authenticated/claims/$id/bank': typeof AuthenticatedClaimsIdBankRoute
+  '/_authenticated/bank/$id': typeof AuthenticatedBankIdRoute
+  '/_authenticated/claims/$id': typeof AuthenticatedClaimsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -96,8 +95,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/claims'
     | '/new'
+    | '/bank/$id'
     | '/claims/$id'
-    | '/claims/$id/bank'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -105,8 +104,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/claims'
     | '/new'
+    | '/bank/$id'
     | '/claims/$id'
-    | '/claims/$id/bank'
   id:
     | '__root__'
     | '/'
@@ -115,8 +114,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_authenticated/claims'
     | '/_authenticated/new'
+    | '/_authenticated/bank/$id'
     | '/_authenticated/claims/$id'
-    | '/_authenticated/claims/$id/bank'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -177,35 +176,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClaimsIdRouteImport
       parentRoute: typeof AuthenticatedClaimsRoute
     }
-    '/_authenticated/claims/$id/bank': {
-      id: '/_authenticated/claims/$id/bank'
-      path: '/bank'
-      fullPath: '/claims/$id/bank'
-      preLoaderRoute: typeof AuthenticatedClaimsIdBankRouteImport
-      parentRoute: typeof AuthenticatedClaimsIdRoute
+    '/_authenticated/bank/$id': {
+      id: '/_authenticated/bank/$id'
+      path: '/bank/$id'
+      fullPath: '/bank/$id'
+      preLoaderRoute: typeof AuthenticatedBankIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
-interface AuthenticatedClaimsIdRouteChildren {
-  AuthenticatedClaimsIdBankRoute: typeof AuthenticatedClaimsIdBankRoute
-}
-
-const AuthenticatedClaimsIdRouteChildren: AuthenticatedClaimsIdRouteChildren = {
-  AuthenticatedClaimsIdBankRoute: AuthenticatedClaimsIdBankRoute,
-}
-
-const AuthenticatedClaimsIdRouteWithChildren =
-  AuthenticatedClaimsIdRoute._addFileChildren(
-    AuthenticatedClaimsIdRouteChildren,
-  )
-
 interface AuthenticatedClaimsRouteChildren {
-  AuthenticatedClaimsIdRoute: typeof AuthenticatedClaimsIdRouteWithChildren
+  AuthenticatedClaimsIdRoute: typeof AuthenticatedClaimsIdRoute
 }
 
 const AuthenticatedClaimsRouteChildren: AuthenticatedClaimsRouteChildren = {
-  AuthenticatedClaimsIdRoute: AuthenticatedClaimsIdRouteWithChildren,
+  AuthenticatedClaimsIdRoute: AuthenticatedClaimsIdRoute,
 }
 
 const AuthenticatedClaimsRouteWithChildren =
@@ -214,11 +200,13 @@ const AuthenticatedClaimsRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedClaimsRoute: typeof AuthenticatedClaimsRouteWithChildren
   AuthenticatedNewRoute: typeof AuthenticatedNewRoute
+  AuthenticatedBankIdRoute: typeof AuthenticatedBankIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedClaimsRoute: AuthenticatedClaimsRouteWithChildren,
   AuthenticatedNewRoute: AuthenticatedNewRoute,
+  AuthenticatedBankIdRoute: AuthenticatedBankIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

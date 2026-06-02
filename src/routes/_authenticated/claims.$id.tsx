@@ -118,7 +118,7 @@ function ClaimDetail() {
             <p className="mt-1 text-sm">
               Add your bank details and we'll transfer <strong>€{(amount - amount * COMMISSION_RATE).toFixed(2)}</strong> within {eta} days.
             </p>
-            <Link to="/claims/$id/bank" params={{ id: claim.id }}
+            <Link to="/bank/$id" params={{ id: claim.id }}
               className="mt-3 inline-block rounded-xl bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold">
               Add bank details →
             </Link>
@@ -142,7 +142,7 @@ function ClaimDetail() {
                 {bank.bic && <p className="mt-1 text-sm font-mono"><span className="text-muted-foreground font-sans">BIC:</span> {bank.bic}</p>}
               </div>
               {claim.status !== "paid" && (
-                <Link to="/claims/$id/bank" params={{ id: claim.id }}
+                <Link to="/bank/$id" params={{ id: claim.id }}
                   className="text-sm font-medium text-primary hover:underline">
                   Edit
                 </Link>

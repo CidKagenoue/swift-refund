@@ -77,7 +77,7 @@ function ClaimsPage() {
             <div className="rounded-2xl bg-card border border-border divide-y divide-border overflow-hidden">
               {claims.map((c) => (
                 <Link key={c.id}
-                  to={c.status === "approved" ? "/claims/$id/bank" : "/claims/$id"}
+                  to={c.status === "approved" ? "/bank/$id" : "/claims/$id"}
                   params={{ id: c.id }}
                   className="flex items-center justify-between px-5 py-4 hover:bg-secondary transition">
                   <div>
