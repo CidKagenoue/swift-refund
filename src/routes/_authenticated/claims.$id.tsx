@@ -116,8 +116,12 @@ function ClaimDetail() {
           <div className="mt-6 rounded-2xl bg-accent text-accent-foreground p-5 border-2 border-accent animate-in fade-in">
             <p className="text-sm font-bold uppercase tracking-wide">🎉 Your refund was approved!</p>
             <p className="mt-1 text-sm">
-              Add your bank details below and we'll transfer <strong>€{(amount - amount * COMMISSION_RATE).toFixed(2)}</strong> within {eta} days.
+              Add your bank details and we'll transfer <strong>€{(amount - amount * COMMISSION_RATE).toFixed(2)}</strong> within {eta} days.
             </p>
+            <Link to="/claims/$id/bank" params={{ id: claim.id }}
+              className="mt-3 inline-block rounded-xl bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold">
+              Add bank details →
+            </Link>
           </div>
         )}
         {claim.status === "paid" && (
@@ -127,9 +131,24 @@ function ClaimDetail() {
           </div>
         )}
 
-        {/* Bank details after approval */}
-        {(claim.status === "approved" || claim.status === "paid") && (
-          <BankSection claimId={claim.id} initial={bank} onSaved={setBank} disabled={claim.status === "paid"} />
+        {/* Bank details summary (only once saved) */}
+        {(claim.status === "approved" || claim.status === "paid") && bank && (
+          <section className="mt-6 rounded-2xl bg-card border border-border p-6">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold">Payout details</h2>
+                <p className="mt-2 text-sm"><span className="text-muted-foreground">Holder:</span> {bank.account_holder}</p>
+                <p className="mt-1 text-sm font-mono"><span className="text-muted-foreground font-sans">IBAN:</span> {bank.iban}</p>
+                {bank.bic && <p className="mt-1 text-sm font-mono"><span className="text-muted-foreground font-sans">BIC:</span> {bank.bic}</p>}
+              </div>
+              {claim.status !== "paid" && (
+                <Link to="/claims/$id/bank" params={{ id: claim.id }}
+                  className="text-sm font-medium text-primary hover:underline">
+                  Edit
+                </Link>
+              )}
+            </div>
+          </section>
         )}
 
         {/* Timeline */}
