@@ -6,7 +6,7 @@ import {
   saveBankDetails, type BankDetails, type Claim,
 } from "@/lib/claims";
 
-export const Route = createFileRoute("/_authenticated/claims/$id/bank")({
+export const Route = createFileRoute("/_authenticated/bank/$id")({
   component: BankDetailsScreen,
   head: () => ({ meta: [{ title: "Bank details · RefundHunters" }] }),
 });
